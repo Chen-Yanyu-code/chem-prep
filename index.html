@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>化学炼金术 - 初中化学趣味备考</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">🧪 化学炼金术</div>
+      <nav class="nav">
+        <a href="#" class="nav-item active" data-tab="home">首页</a>
+        <a href="#" class="nav-item" data-tab="elements">🔮 元素图鉴</a>
+        <a href="#" class="nav-item" data-tab="detective">🕵️ 实验侦探</a>
+        <a href="#" class="nav-item" data-tab="identify">🔍 物质鉴别</a>
+        <a href="#" class="nav-item" data-tab="inference">🧩 推断闯关</a>
+      </nav>
+      <div class="user-info">
+        <span class="coin">🪙 <span id="coinCount">100</span></span>
+        <span class="streak">🔥 <span id="streakCount">0</span>天</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 首页 -->
+  <section id="tab-home" class="tab-content active">
+    <div class="hero">
+      <div class="hero-bg"></div>
+      <h1>欢迎来到化学炼金术！</h1>
+      <p>用最有趣的方式，攻克初中化学中考 🎯</p>
+      <div class="hero-cards">
+        <div class="hero-card" onclick="switchTab('elements')">
+          <div class="hero-card-icon">🔮</div>
+          <h3>元素图鉴</h3>
+          <p>收集元素卡牌，掌握化学元素性质</p>
+        </div>
+        <div class="hero-card" onclick="switchTab('detective')">
+          <div class="hero-card-icon">🕵️</div>
+          <h3>实验侦探</h3>
+          <p>根据实验现象，推理出正确答案</p>
+        </div>
+        <div class="hero-card" onclick="switchTab('identify')">
+          <div class="hero-card-icon">🔍</div>
+          <h3>物质鉴别</h3>
+          <p>模拟实验操作，推断烧杯中的未知物质</p>
+        </div>
+        <div class="hero-card" onclick="switchTab('inference')">
+          <div class="hero-card-icon">🧩</div>
+          <h3>推断闯关</h3>
+          <p>根据转化关系推断物质，攻克中考推断题</p>
+        </div>
+      </div>
+      <!-- 中考倒计时 -->
+      <div class="countdown-bar">
+        <span>⏰ 中考倒计时：</span>
+        <span id="countdown">计算中...</span>
+        <span>天</span>
+      </div>
+    </div>
+
+    <!-- 知识速查 -->
+    <div class="quick-ref">
+      <h2>📚 中考化学速查表</h2>
+      <div class="ref-tabs">
+        <button class="ref-tab active" onclick="showRef('common')">常见物质</button>
+        <button class="ref-tab" onclick="showRef('ions')">离子检验</button>
+        <button class="ref-tab" onclick="showRef('gas')">气体制取</button>
+        <button class="ref-tab" onclick="showRef('ph')">pH口诀</button>
+      </div>
+      <div id="ref-content" class="ref-content"></div>
+    </div>
+  </section>
+
+  <!-- 元素图鉴 -->
+  <section id="tab-elements" class="tab-content">
+    <div class="section-header">
+      <h2>🔮 元素图鉴</h2>
+      <p>点击元素卡牌，查看详细性质和常见化合物！收集全部20张解锁「元素大师」称号！</p>
+    </div>
+    <div id="elementGrid" class="element-grid"></div>
+    <!-- 元素详情弹窗 -->
+    <div id="elementModal" class="modal">
+      <div class="modal-content element-detail">
+        <span class="modal-close" onclick="closeModal('elementModal')">&times;</span>
+        <div id="elementDetailBody"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 实验侦探 -->
+  <section id="tab-detective" class="tab-content">
+    <div class="section-header">
+      <h2>🕵️ 实验侦探</h2>
+      <p>根据实验现象描述，推理出实验名称、药品或结论！</p>
+      <div class="difficulty-selector">
+        <button class="diff-btn active" onclick="setDetectiveLevel('easy',this)">★ 入门</button>
+        <button class="diff-btn" onclick="setDetectiveLevel('medium',this)">★★ 进阶</button>
+        <button class="diff-btn" onclick="setDetectiveLevel('hard',this)">★★★ 挑战</button>
+      </div>
+    </div>
+    <div id="detectiveGame" class="detective-game">
+      <div class="detective-scene">
+        <div id="detectiveSceneIcon" class="scene-icon">🔬</div>
+        <div id="detectiveQuestion" class="detective-question"></div>
+      </div>
+      <div id="detectiveOptions" class="detective-options"></div>
+      <div id="detectiveFeedback" class="detective-feedback hidden"></div>
+      <div class="detective-actions">
+        <button id="detectiveNextBtn" class="btn btn-primary hidden" onclick="nextDetectiveQuestion()">下一题 →</button>
+        <div id="detectiveScore" class="game-score">得分：<span id="detectiveScoreVal">0</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 物质鉴别 -->
+  <section id="tab-identify" class="tab-content">
+    <div class="section-header">
+      <h2>🔍 未知物质鉴别</h2>
+      <p>烧杯中有一种未知物质，通过观察和加入试剂来推断它是什么！</p>
+    </div>
+    <div class="identify-layout">
+      <!-- 左侧：烧杯 + 操作区 -->
+      <div class="identify-left">
+        <div class="beaker-area">
+          <div class="beaker-wrap">
+            <div class="beaker-svg-wrap">
+              <svg class="beaker-svg" viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
+                <path d="M30,10 L30,80 L10,150 L110,150 L90,80 L90,10 Z" fill="rgba(180,220,255,0.18)" stroke="#4a90d9" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M30,10 L90,10" fill="none" stroke="#4a90d9" stroke-width="3"/>
+                <ellipse id="liquidEllipse" cx="60" cy="140" rx="40" ry="6" fill="rgba(100,180,255,0.35)"/>
+                <rect id="liquidRect" x="20" y="120" width="80" height="22" fill="rgba(100,180,255,0.35)" rx="2"/>
+              </svg>
+              <div id="beakerIcon" class="beaker-substance-icon">❓</div>
+            </div>
+            <div id="beakerLabel" class="beaker-label">未知物质</div>
+          </div>
+          <!-- 实验现象气泡 -->
+          <div id="reactionBubble" class="reaction-bubble hidden"></div>
+        </div>
+        <!-- 操作按钮区 -->
+        <div class="ops-section">
+          <div class="ops-title">🧪 选择操作：</div>
+          <div id="opsButtons" class="ops-buttons"></div>
+        </div>
+        <!-- 历史记录 -->
+        <div class="obs-history" id="obsHistory">
+          <div class="obs-history-title">📋 实验记录</div>
+          <div id="obsLog" class="obs-log"><div class="obs-empty">还没有进行任何操作，点击上方按钮开始实验！</div></div>
+        </div>
+      </div>
+      <!-- 右侧：提交猜测 + 控制 -->
+      <div class="identify-right">
+        <div class="identify-card">
+          <div class="identify-card-title">🏆 提交判断</div>
+          <p class="identify-hint">根据实验现象，猜测烧杯中的物质：</p>
+          <div id="guessOptions" class="guess-options"></div>
+          <div id="identifyFeedback" class="identify-feedback hidden"></div>
+          <div class="identify-actions">
+            <button class="btn btn-primary" onclick="submitIdentify()">提交答案</button>
+            <button class="btn btn-secondary" onclick="nextIdentify()">换一道题 🔄</button>
+          </div>
+          <div id="identifyScore" class="game-score">得分：<span id="identifyScoreVal">0</span></div>
+        </div>
+        <div class="identify-card" id="hintsCard">
+          <div class="identify-card-title">💡 提示（消耗20金币）</div>
+          <div id="hintText" class="hint-text">点击获取提示，缩小判断范围</div>
+          <button class="btn btn-secondary" onclick="getHint()" id="hintBtn">获取提示 (-20🪙)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 推断闯关 -->
+  <section id="tab-inference" class="tab-content">
+    <div class="section-header">
+      <h2>🧩 化学推断闯关</h2>
+      <p>根据转化关系和现象推断未知物质，攻克中考最难推断题！</p>
+      <div class="difficulty-selector">
+        <button class="diff-btn active" onclick="setInferLevel('easy',this)">★ 基础</button>
+        <button class="diff-btn" onclick="setInferLevel('medium',this)">★★ 进阶</button>
+        <button class="diff-btn" onclick="setInferLevel('hard',this)">★★★ 挑战</button>
+      </div>
+    </div>
+    <div class="infer-game" id="inferGame">
+      <div class="infer-progress">
+        <span>第 <span id="inferCur">1</span>/<span id="inferTotal">5</span> 题</span>
+        <div class="eq-progress-bar"><div id="inferBar" class="eq-progress-fill"></div></div>
+        <span>得分 <span id="inferScoreVal">0</span></span>
+      </div>
+      <!-- 题目描述 -->
+      <div class="infer-desc-box">
+        <div id="inferDesc" class="infer-desc"></div>
+        <div id="inferRelations" class="infer-relations"></div>
+      </div>
+      <!-- 填写答案 -->
+      <div id="inferBlanks" class="infer-blanks"></div>
+      <!-- 反馈 -->
+      <div id="inferFeedback" class="infer-feedback hidden"></div>
+      <!-- 操作按钮 -->
+      <div class="infer-actions">
+        <button class="btn btn-primary" onclick="checkInference()">提交答案</button>
+        <button id="inferNextBtn" class="btn btn-secondary hidden" onclick="nextInference()">下一题 →</button>
+      </div>
+      <!-- 解析区 -->
+      <div id="inferAnalysis" class="infer-analysis hidden"></div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <p>🧪 化学炼金术 — 初中化学趣味备考平台 | 适用于九年级化学中考复习</p>
+    <p>⚠️ 本网站仅供学习娱乐，实验请在老师指导下进行</p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
