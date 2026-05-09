@@ -527,6 +527,130 @@ function addCoins(n) {
   el.textContent = cur + n;
 }
 
+// ===== 金币商店 =====
+
+// 额外高级操作（当前物质支持的）
+const ADVANCED_OPS = [
+  '加入KSCN溶液', '加入铝粉（铝热反应）', '加入CO（一氧化碳，加热）',
+  '加入H₂（加热）', '加入MnO₂（二氧化锰）', '加入铁粉',
+  '加入锌片', '加入铜片', '加入大理石', '加入铁片',
+  '加入NaOH溶液', '通入CO₂气体', '通入HCl气体',
+  '加入Na₂CO₃溶液', '加入KMnO₄溶液', '加入Fe（铁粉）',
+  '加入血液/肝脏组织', '加入Na₂SO₃溶液', '加入乙醇（酒精）',
+  '加入FeSO₄溶液', '加入BaCl₂+稀HNO₃', '加入CaCl₂溶液'
+];
+
+function shopUnlockOps() {
+  const coins = parseInt(document.getElementById('coinCount').textContent) || 0;
+  const fb = document.getElementById('shopFeedback');
+  if (coins < 30) {
+    fb.className = 'shop-feedback wrong';
+    fb.textContent = '❌ 金币不足！需要30🪙';
+    fb.classList.remove('hidden');
+    return;
+  }
+  if (!currentSubstance) {
+    fb.className = 'shop-feedback wrong';
+    fb.textContent = '❌ 请先进入物质鉴别再购买';
+    fb.classList.remove('hidden');
+    return;
+  }
+  // 找出当前物质有、但还没展示的高级操作
+  const allOps = Object.keys(currentSubstance.reactions);
+  const currentDisplayOps = ['观察外观', '加热', '加入石蕊溶液', '加入酚酞溶液', '加入稀盐酸', '加入稀硫酸', '加入AgNO₃溶液', '加入BaCl₂溶液', '加入NaOH溶液', '加入CuSO₄溶液', '加入FeCl₃溶液', '加入Na₂CO₃溶液', '加水溶解后测pH'];
+  const hidden = allOps.filter(op => !currentDisplayOps.includes(op) && !usedOps.includes(op));
+  if (hidden.length === 0) {
+    fb.className = 'shop-feedback warn';
+    fb.textContent = '⚠️ 该物质没有更多隐藏操作了！';
+    fb.classList.remove('hidden');
+    return;
+  }
+  addCoins(-30);
+  // 添加到操作按钮区
+  const opsDiv = document.getElementById('opsButtons');
+  hidden.forEach(op => {
+    const btn = document.createElement('button');
+    btn.className = 'op-btn op-advanced';
+    btn.textContent = '🔬 ' + op;
+    btn.onclick = () => doOperation(op);
+    if (usedOps.includes(op)) btn.classList.add('op-used');
+    opsDiv.appendChild(btn);
+  });
+  fb.className = 'shop-feedback correct';
+  fb.textContent = '✅ 解锁了 ' + hidden.length + ' 个高级操作！-30🪙';
+  fb.classList.remove('hidden');
+  setTimeout(() => fb.classList.add('hidden'), 3000);
+}
+
+function shopViewArchive() {
+  const coins = parseInt(document.getElementById('coinCount').textContent) || 0;
+  const fb = document.getElementById('shopFeedback');
+  if (coins < 50) {
+    fb.className = 'shop-feedback wrong';
+    fb.textContent = '❌ 金币不足！需要50🪙';
+    fb.classList.remove('hidden');
+    return;
+  }
+  if (!currentSubstance) {
+    fb.className = 'shop-feedback wrong';
+    fb.textContent = '❌ 请先进入物质鉴别再购买';
+    fb.classList.remove('hidden');
+    return;
+  }
+  addCoins(-50);
+  const body = document.getElementById('archiveBody');
+  let html = '<h3 style="margin-bottom:12px">📄 ' + currentSubstance.name + ' 完整档案</h3>';
+  html += '<table class="archive-table"><tr><th>操作</th><th>现象</th></tr>';
+  Object.entries(currentSubstance.reactions).forEach(([op, result]) => {
+    html += '<tr><td>' + op + '</td><td>' + result + '</td></tr>';
+  });
+  html += '</table>';
+  html += '<p style="margin-top:12px;color:var(--text-light);font-size:0.85rem">💡 ' + currentSubstance.explanation + '</p>';
+  body.innerHTML = html;
+  document.getElementById('archiveModal').classList.add('active');
+  fb.className = 'shop-feedback correct';
+  fb.textContent = '✅ 已查看物质档案 -50🪙';
+  fb.classList.remove('hidden');
+  setTimeout(() => fb.classList.add('hidden'), 2000);
+}
+
+const CAPSULES = [
+  { title: '酸碱中和口诀', text: '酸碱中和生盐水，pH=7是终点；酚酞变红是碱，变无色是恰好中和。' },
+  { title: '金属活动顺序', text: 'K Ca Na Mg Al Zn Fe Ni Sn Pb (H) Cu Hg Ag Pt Au\n口诀：钾钙钠镁铝，锌铁镍锡铅；氢铜汞银铂金。排在H前面才与酸反应产生H₂！' },
+  { title: '三大化肥口诀', text: '氮肥促进茎叶生长（叶色深绿）；磷肥促进根系和花果；钾肥促进茎秆健壮和果实。碳酸氢铵（NH₄HCO₃）最不稳定，受热分解，不能与碱混放！' },
+  { title: 'NaOH与Na₂CO₃区别', text: 'NaOH加热不分解；Na₂CO₃加热也不分解；但NaHCO₃加热会分解→CO₂+H₂O！\n另一区别：Na₂CO₃+BaCl₂→白色沉淀；NaHCO₃+BaCl₂→无现象。' },
+  { title: 'CO和CO₂的区别', text: 'CO：可燃（淡蓝火焰）、有毒、还原性（还原Fe₂O₃）、不与石灰水反应。\nCO₂：不可燃、无毒、与石灰水变浑浊、与NaOH反应。\n记忆：CO是"毒气"，CO₂是"温室气体"。' },
+  { title: '常见沉淀颜色口诀', text: '蓝色沉淀：Cu(OH)₂\n红褐色沉淀：Fe(OH)₃\n白色沉淀：AgCl（不溶于稀HNO₃）、BaSO₄（不溶于稀HNO₃）、CaCO₃（溶于稀HCl）、Mg(OH)₂\n淡黄色：AgBr\n黄色：AgI' },
+  { title: '实验安全三原则', text: '① 先撤导管，后熄灯（防止液体倒流炸裂试管）\n② 点燃气体前必须验纯（防止爆炸）\n③ 浓H₂SO₄稀释：酸入水，边搅拌（防止局部沸腾飞溅）' },
+  { title: 'pH与颜色口诀', text: '石蕊：酸红碱蓝中紫；酚酞：酸中无色，碱变红。\n强酸pH<7，强碱pH>7，中性pH=7。\nNaHCO₃溶液pH≈8（弱碱），Na₂CO₃溶液pH≈11（碱性更强）。' },
+  { title: '碳的化学性质', text: '常温：稳定；高温：还原性（C+CO₂→2CO；C+CuO→Cu+CO₂；C+Fe₂O₃→Fe+CO₂）；燃烧：充足O₂→CO₂；不足O₂→CO。\n金刚石（最硬）、石墨（导电软滑）、C₆₀（球形）是同素异形体。' },
+  { title: '复分解反应发生条件', text: '两种化合物相互交换成分，必须有以下之一：\n① 生成沉淀（↓）\n② 生成气体（↑）\n③ 生成水（H₂O）\n只要满足以上一条，复分解反应就能发生！' }
+];
+
+function shopCapsule() {
+  const coins = parseInt(document.getElementById('coinCount').textContent) || 0;
+  const fb = document.getElementById('shopFeedback');
+  if (coins < 100) {
+    fb.className = 'shop-feedback wrong';
+    fb.textContent = '❌ 金币不足！需要100🪙';
+    fb.classList.remove('hidden');
+    return;
+  }
+  addCoins(-100);
+  const cap = CAPSULES[Math.floor(Math.random() * CAPSULES.length)];
+  const body = document.getElementById('capsuleBody');
+  body.innerHTML =
+    '<div class="capsule-header">🎲 考前锦囊</div>' +
+    '<div class="capsule-title">📌 ' + cap.title + '</div>' +
+    '<div class="capsule-text">' + cap.text.replace(/\n/g, '<br>') + '</div>' +
+    '<div class="capsule-footer">已消耗 100🪙，好好记住这条口诀！</div>';
+  document.getElementById('capsuleModal').classList.add('active');
+  fb.className = 'shop-feedback correct';
+  fb.textContent = '🎲 已抽取考前锦囊 -100🪙';
+  fb.classList.remove('hidden');
+  setTimeout(() => fb.classList.add('hidden'), 2000);
+}
+
 // ===== 工具函数 =====
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -538,5 +662,11 @@ function shuffle(arr) {
 
 // 模态框点击外部关闭
 document.getElementById('elementModal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('active');
+});
+document.getElementById('archiveModal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('active');
+});
+document.getElementById('capsuleModal').addEventListener('click', function(e) {
   if (e.target === this) this.classList.remove('active');
 });
