@@ -302,16 +302,17 @@ function updateBeakerVisual(op) {
   const label = document.getElementById('beakerLabel');
   const ellipse = document.getElementById('liquidEllipse');
   const rect = document.getElementById('liquidRect');
+  const result = currentSubstance.reactions[op] || '';
   // 根据操作更新外观
   if (op === '观察外观') {
     icon.textContent = currentSubstance.icon;
     label.textContent = currentSubstance.appearance.split('，')[0];
   }
-  if (currentSubstance.formula === 'CuSO₄' || (op === '加入CuSO₄溶液' && result && result.includes('蓝色'))) {
+  if (currentSubstance.formula === 'CuSO₄' || (op === '加入CuSO₄溶液' && result.includes('蓝色'))) {
     ellipse.setAttribute('fill', 'rgba(52,152,219,0.5)');
     rect.setAttribute('fill', 'rgba(52,152,219,0.5)');
   }
-  if (result && result.includes('变红') && !result.includes('红褐色')) {
+  if (result.includes('变红') && !result.includes('红褐色')) {
     if (op.includes('酚酞') || op.includes('石蕊')) {
       if (result.includes('蓝色')) {
         ellipse.setAttribute('fill', 'rgba(52,152,219,0.5)');
@@ -319,11 +320,11 @@ function updateBeakerVisual(op) {
       }
     }
   }
-  if (result && result.includes('红色')) {
+  if (result.includes('红色')) {
     ellipse.setAttribute('fill', 'rgba(231,76,60,0.4)');
     rect.setAttribute('fill', 'rgba(231,76,60,0.4)');
   }
-  if (result && result.includes('沉淀') && !result.includes('蓝色') && !result.includes('红褐色') && !result.includes('白色')) {
+  if (result.includes('沉淀') && !result.includes('蓝色') && !result.includes('红褐色') && !result.includes('白色')) {
     ellipse.setAttribute('fill', 'rgba(149,165,166,0.5)');
     rect.setAttribute('fill', 'rgba(149,165,166,0.5)');
   }
@@ -557,8 +558,9 @@ function shopUnlockOps() {
   }
   // 找出当前物质有、但还没展示的高级操作
   const allOps = Object.keys(currentSubstance.reactions);
-  const currentDisplayOps = ['观察外观', '加热', '加入石蕊溶液', '加入酚酞溶液', '加入稀盐酸', '加入稀硫酸', '加入AgNO₃溶液', '加入BaCl₂溶液', '加入NaOH溶液', '加入CuSO₄溶液', '加入FeCl₃溶液', '加入Na₂CO₃溶液', '加水溶解后测pH'];
-  const hidden = allOps.filter(op => !currentDisplayOps.includes(op) && !usedOps.includes(op));
+  // 和 renderOpsButtons 里的 displayOps 保持一致
+  const displayOps = ['观察外观', '加热', '加入石蕊溶液', '加入酚酞溶液', '加入稀盐酸', '加入稀硫酸', '加入AgNO₃溶液', '加入BaCl₂溶液', '加入NaOH溶液', '加入CuSO₄溶液', '加入FeCl₃溶液', '加入Na₂CO₃溶液', '加水溶解后测pH'];
+  const hidden = allOps.filter(op => !displayOps.includes(op) && !usedOps.includes(op));
   if (hidden.length === 0) {
     fb.className = 'shop-feedback warn';
     fb.textContent = '⚠️ 该物质没有更多隐藏操作了！';
