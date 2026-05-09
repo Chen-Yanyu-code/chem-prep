@@ -169,6 +169,37 @@
           <div id="hintText" class="hint-text">点击获取提示，缩小判断范围</div>
           <button class="btn btn-secondary" onclick="getHint()" id="hintBtn">获取提示 (-20🪙)</button>
         </div>
+        <!-- 金币商店 -->
+        <div class="identify-card coin-shop-card">
+          <div class="identify-card-title">🏪 金币商店</div>
+          <div class="shop-items">
+            <div class="shop-item" onclick="shopUnlockOps()">
+              <span class="shop-icon">🔬</span>
+              <div class="shop-info">
+                <div class="shop-name">解锁高级操作</div>
+                <div class="shop-desc">KSCN检验、铝热反应等特殊操作</div>
+              </div>
+              <span class="shop-price">-30🪙</span>
+            </div>
+            <div class="shop-item" onclick="shopViewArchive()">
+              <span class="shop-icon">📄</span>
+              <div class="shop-info">
+                <div class="shop-name">查看物质档案</div>
+                <div class="shop-desc">直接查看该物质的全部反应现象</div>
+              </div>
+              <span class="shop-price">-50🪙</span>
+            </div>
+            <div class="shop-item" onclick="shopCapsule()">
+              <span class="shop-icon">🎲</span>
+              <div class="shop-info">
+                <div class="shop-name">考前锦囊</div>
+                <div class="shop-desc">抽取一条中考化学必记口诀</div>
+              </div>
+              <span class="shop-price">-100🪙</span>
+            </div>
+          </div>
+          <div id="shopFeedback" class="shop-feedback hidden"></div>
+        </div>
       </div>
     </div>
   </section>
@@ -208,6 +239,22 @@
       <div id="inferAnalysis" class="infer-analysis hidden"></div>
     </div>
   </section>
+
+  <!-- 物质档案弹窗 -->
+  <div id="archiveModal" class="modal">
+    <div class="modal-content archive-modal-content">
+      <span class="modal-close" onclick="closeModal('archiveModal')">&times;</span>
+      <div id="archiveBody"></div>
+    </div>
+  </div>
+
+  <!-- 考前锦囊弹窗 -->
+  <div id="capsuleModal" class="modal">
+    <div class="modal-content capsule-modal-content">
+      <span class="modal-close" onclick="closeModal('capsuleModal')">&times;</span>
+      <div id="capsuleBody"></div>
+    </div>
+  </div>
 
   <!-- 页脚 -->
   <footer class="footer">
